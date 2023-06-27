@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <style>
+      .chart {
+        position: absolute;
+        height: 500px;
+        width: 300px;
+        right: 0;
+        border-radius: 10px;
+        bottom: 0;
+        background-color: #292929;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
+  </head>
+  <body style="background-color: #424242">
+    <iframe
+      style="height: 100%; width: 100%"
+      src="https://niftychain.in/"
+      frameborder="0"
+    ></iframe>
+    <div class="chart">
+      <text style="align-self: center; color: white" id="stkprice"></text>
+      <canvas height="480px" id="myChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      const ctx = document.getElementById("myChart");
+      Chart.defaults.color = "white";
+      let myChart = new Chart(ctx, {
+        type: "bar",
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+        },
+        data: {
+          labels: ["call", "put"],
+
+          datasets: [
+            {
+              label: "OI",
+              data: [12, 19],
+              borderWidth: 1,
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.2)",
+                "rgba(75, 192, 192, 0.2)",
+              ],
+              borderColor: ["rgba(255, 99, 132, 1)", "rgba(75, 192, 192, 1)"],
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+      function setOi() {
+        fetch("https://api.niftychain.in/api/live-data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          },
+          body: "ticker=NIFTY",
+        }).then(async (data) => {
+          let hehe = await data.json();
+          let stkprice = Math.round(hehe.data.underlyingValue / 50) * 50;
+          document.getElementById("stkprice").innerHTML =
+            "Strike Price:" + stkprice;
+          for (x in hehe.data.data) {
+            if (hehe.data.data[x].strikePrice == stkprice)
+              addData(
+                myChart,
+                [
+                  hehe.data.data[x].ce.openInterest,
+                  hehe.data.data[x].pe.openInterest,
+                ],
+                0
+              );
+          }
+        });
+      }
+      setOi();
+      setInterval(() => setOi(), 10000);
+
+      function addData(chart, data, datasetIndex) {
+        chart.data.datasets[datasetIndex].data = data;
+        chart.update();
+      }
+    </script>
+  </body>
+</html>

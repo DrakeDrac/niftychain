@@ -2,7 +2,7 @@
   <head>
     <style>
       .chart {
-        height: 500px;
+        height: 400px;
         width: 300px;
         border-radius: 10px;
         background-color: #292929;
@@ -23,7 +23,7 @@
         src="https://niftychain.in/"
         frameborder="0"
       ></iframe>
-      <div style="flex: 0.8; height: 100%" class="chart">
+      <div style="flex: 0.8; height: 95%" class="chart">
         <div style="flex-direction: row">
           <span style="color: white"> Ticker: </span>
           <select onchange="setTicker(this.value)" id="ticker"></select>
@@ -35,6 +35,7 @@
             </option>
           </select>
         </div>
+        <span id="PCR" style="color: white"> PCR: 0 </span>
         <canvas id="myChart"></canvas>
       </div>
     </div>
@@ -130,8 +131,11 @@
             hehe.data.data[1].strikePrice - hehe.data.data[0].strikePrice;
           let stkprice =
             Math.round(hehe.data.underlyingValue / stkDiff) * stkDiff;
-
+          let pSum = 0;
+          let cSum = 0;
           for (let x = 0; x < hehe.data.data.length; x++) {
+            cSum += hehe.data.data[x].ce.openInterest;
+            pSum += hehe.data.data[x].pe.openInterest;
             if (hehe.data.data[x].strikePrice == stkprice) {
               addData(
                 myChart,
@@ -155,6 +159,8 @@
               );
             }
           }
+          document.getElementById("PCR").innerHTML =
+            "PCR: " + Math.round((pSum / cSum) * 1000) / 1000;
         });
       }
       setOi();

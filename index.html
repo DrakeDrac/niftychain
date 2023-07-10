@@ -24,6 +24,17 @@
         frameborder="0"
       ></iframe>
       <div style="flex: 0.8; height: 100%" class="chart">
+        <div style="flex-direction: row">
+          <span style="color: white"> Ticker: </span>
+          <select onchange="setTicker(this.value)" id="ticker"></select>
+          <span style="color: white"> Mode: </span>
+          <select onchange="setMode(this.value)" id="Mode">
+            <option value="changeinOpenInterest">Change in OI</option>
+            <option selected="selected" value="openInterest">
+              Open Interest
+            </option>
+          </select>
+        </div>
         <canvas id="myChart"></canvas>
       </div>
     </div>
@@ -31,6 +42,27 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+      let ticker = "NIFTY";
+      function setTicker(e) {
+        ticker = e;
+        setOi();
+      }
+      let Mode = "openInterest";
+      function setMode(e) {
+        Mode = e;
+        setOi();
+      }
+      fetch("https://v2-api.niftychain.in/api/get-tickers")
+        .then((data) => data.json())
+        .then((data) => {
+          let tickerEl = document.getElementById("ticker");
+          data.data.forEach((e) => {
+            if (e.Name == "NIFTY")
+              tickerEl.innerHTML += `<option selected="selected" value="${e.Name}">${e.Name}</option>`;
+            else
+              tickerEl.innerHTML += `<option value="${e.Name}">${e.Name}</option>`;
+          });
+        });
       const ctx = document.getElementById("myChart");
 
       const data = {
@@ -86,34 +118,42 @@
       });
 
       function setOi() {
-        fetch("https://api.niftychain.in/api/live-data", {
+        fetch("https://v2-api.niftychain.in/api/live-data", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
           },
-          body: "ticker=NIFTY",
+          body: "ticker=" + ticker,
         }).then(async (data) => {
           let hehe = await data.json();
-          let stkprice = Math.round(hehe.data.underlyingValue / 50) * 50;
+          let stkDiff =
+            hehe.data.data[1].strikePrice - hehe.data.data[0].strikePrice;
+          let stkprice =
+            Math.round(hehe.data.underlyingValue / stkDiff) * stkDiff;
 
-          for (x in hehe.data.data) {
-            if (hehe.data.data[x].strikePrice == stkprice)
+          for (let x = 0; x < hehe.data.data.length; x++) {
+            if (hehe.data.data[x].strikePrice == stkprice) {
               addData(
                 myChart,
                 [
-                  hehe.data.data[x - 1].ce.openInterest,
-                  hehe.data.data[x - 1].pe.openInterest,
-                  hehe.data.data[x].ce.openInterest,
-                  hehe.data.data[x].pe.openInterest,
+                  hehe.data.data[x - 1].ce[Mode],
+                  hehe.data.data[x - 1].pe[Mode],
+                  hehe.data.data[x].ce[Mode],
+                  hehe.data.data[x].pe[Mode],
+                  hehe.data.data[x + 1].ce[Mode],
+                  hehe.data.data[x + 1].pe[Mode],
                 ],
                 [
                   hehe.data.data[x - 1].strikePrice,
                   hehe.data.data[x - 1].strikePrice,
                   hehe.data.data[x].strikePrice,
                   hehe.data.data[x].strikePrice,
+                  hehe.data.data[x + 1].strikePrice,
+                  hehe.data.data[x + 1].strikePrice,
                 ],
                 0
               );
+            }
           }
         });
       }

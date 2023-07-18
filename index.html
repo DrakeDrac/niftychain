@@ -185,12 +185,13 @@
             document.getElementById("success").play();
           else if (PCR < lastPCR) document.getElementById("error").play();
           document.getElementById("PCR").innerHTML = "PCR: " + PCR;
-          document.getElementById("PCR").style =
-            lastPCR == 0
-              ? "color:white;"
-              : PCR > lastPCR
-              ? "color:green;"
-              : "color:red;";
+          if (PCR != lastPCR)
+            document.getElementById("PCR").style =
+              lastPCR == 0
+                ? "color:white;"
+                : PCR > lastPCR
+                ? "color:green;background-color: white;line-height: 2;"
+                : "color:red;background-color: white;line-height: 2;";
           lastPCR = PCR;
         });
       }

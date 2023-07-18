@@ -42,6 +42,7 @@
           </select>
         </div>
         <span id="PCR" style="color: white"> PCR: 0 </span>
+        <span id="chngPCR" style="color: white"> PCR: 0 </span>
         <canvas id="myChart"></canvas>
       </div>
     </div>
@@ -74,6 +75,7 @@
         });
       const ctx = document.getElementById("myChart");
       let lastPCR = 0;
+      let lastchngPCR = 0;
 
       const data = {
         labels: [2, "4311", "4571", "4588"],
@@ -176,23 +178,38 @@
           let hehe = json.resultData.opDatas;
           let pSum = 0;
           let cSum = 0;
+          let pSumChng = 0;
+          let cSumChng = 0;
           for (x in hehe) {
             pSum += hehe[x].puts_oi;
             cSum += hehe[x].calls_oi;
+            pSumChng += hehe[x].puts_change_oi;
+            cSumChng += hehe[x].calls_change_oi;
           }
           let PCR = Math.round((pSum / cSum) * 1000) / 1000;
           if (PCR > lastPCR && lastPCR != 0)
-            document.getElementById("success").play();
+          document.getElementById("success").play();
           else if (PCR < lastPCR) document.getElementById("error").play();
           document.getElementById("PCR").innerHTML = "PCR: " + PCR;
+          //hehe
+          let chngPCR= Math.round((pSumChng / cSumChng) * 1000) / 1000;
+          document.getElementById("chngPCR").innerHTML =  "changeOi PCR: "+chngPCR;
           if (PCR != lastPCR)
             document.getElementById("PCR").style =
               lastPCR == 0
                 ? "color:white;"
                 : PCR > lastPCR
-                ? "color:green;background-color: white;line-height: 2; font-weight: 900;"
-                : "color:red;background-color: white;line-height: 2; font-weight: 900;";
+                ? "color:green;background-color: white;line-height: 2;"
+                : "color:red;background-color: white;line-height: 2;";
           lastPCR = PCR;
+          if (chngPCR != lastchngPCR)
+            document.getElementById("chngPCR").style =
+            lastchngPCR == 0
+                ? "color:white;"
+                : chngPCR > lastchngPCR
+                ? "color:green;background-color: white;line-height: 2;"
+                : "color:red;background-color: white;line-height: 2;";
+                lastchngPCR = chngPCR;
         });
       }
       setOi();

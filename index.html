@@ -18,6 +18,12 @@
   </head>
   <body style="background-color: #424242">
     <div style="display: flex; flex-direction: row; height: 100%">
+      <audio id="success">
+        <source src="./ok.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="error">
+        <source src="./error.mp3" type="audio/mpeg" />
+      </audio>
       <iframe
         style="flex: 2"
         src="https://niftychain.in/"
@@ -47,6 +53,8 @@
       function setTicker(e) {
         ticker = e;
         setOi();
+        setPCR();
+        lastPCR = 0;
       }
       let Mode = "openInterest";
       function setMode(e) {
@@ -65,6 +73,7 @@
           });
         });
       const ctx = document.getElementById("myChart");
+      let lastPCR = 0;
 
       const data = {
         labels: [2, "4311", "4571", "4588"],
@@ -131,11 +140,7 @@
             hehe.data.data[1].strikePrice - hehe.data.data[0].strikePrice;
           let stkprice =
             Math.round(hehe.data.underlyingValue / stkDiff) * stkDiff;
-          let pSum = 0;
-          let cSum = 0;
           for (let x = 0; x < hehe.data.data.length; x++) {
-            cSum += hehe.data.data[x].ce.openInterest;
-            pSum += hehe.data.data[x].pe.openInterest;
             if (hehe.data.data[x].strikePrice == stkprice) {
               addData(
                 myChart,
@@ -159,12 +164,42 @@
               );
             }
           }
-          document.getElementById("PCR").innerHTML =
-            "PCR: " + Math.round((pSum / cSum) * 1000) / 1000;
+        });
+      }
+      function setPCR() {
+        fetch(
+          "https://webapi.niftytrader.in/webapi/option/fatch-option-chain?symbol=" +
+            ticker
+        ).then(async (data) => {
+          let json = await data.json();
+          console.log(json);
+          let hehe = json.resultData.opDatas;
+          let pSum = 0;
+          let cSum = 0;
+          for (x in hehe) {
+            pSum += hehe[x].puts_oi;
+            cSum += hehe[x].calls_oi;
+          }
+          let PCR = Math.round((pSum / cSum) * 1000) / 1000;
+          if (PCR > lastPCR && lastPCR != 0)
+            document.getElementById("success").play();
+          else if (PCR < lastPCR) document.getElementById("error").play();
+          document.getElementById("PCR").innerHTML = "PCR: " + PCR;
+          document.getElementById("PCR").style =
+            lastPCR == 0
+              ? "color:white;"
+              : PCR > lastPCR
+              ? "color:green;"
+              : "color:red;";
+          lastPCR = PCR;
         });
       }
       setOi();
-      setInterval(() => setOi(), 10000);
+      setPCR();
+      setInterval(() => {
+        setOi();
+        setPCR();
+      }, 10000);
 
       function addData(chart, data, labels, datasetIndex) {
         chart.data.datasets[datasetIndex].data = data;

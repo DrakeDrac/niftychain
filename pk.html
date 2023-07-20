@@ -1,0 +1,225 @@
+<html>
+  <head>
+    <style>
+      .chart {
+        height: 350px;
+        width: 300px;
+        border-radius: 10px;
+        background-color: #292929;
+        display: flex;
+        flex-direction: column;
+      }
+      .abs {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body style="background-color: #424242">
+    <div style="display: flex; flex-direction: row; height: 100%">
+      <audio id="success">
+        <source src="./ok.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="error">
+        <source src="./error.mp3" type="audio/mpeg" />
+      </audio>
+      <div style="flex: 0.8; height: 90%" class="chart">
+        <div style="flex-direction: row">
+          <span style="color: white"> Ticker: </span>
+          <select onchange="setTicker(this.value)" id="ticker"></select>
+          <span style="color: white"> Mode: </span>
+          <select onchange="setMode(this.value)" id="Mode">
+            <option value="changeinOpenInterest">Change in OI</option>
+            <option selected="selected" value="openInterest">
+              Open Interest
+            </option>
+          </select>
+        </div>
+        <span id="PCR" style="color: white"> PCR: 0 </span>
+        <span id="chngPCR" style="color: white"> PCR: 0 </span>
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+      let ticker = "NIFTY";
+      function setTicker(e) {
+        ticker = e;
+        setOi();
+        setPCR();
+        lastPCR = 0;
+      }
+      let Mode = "openInterest";
+      function setMode(e) {
+        Mode = e;
+        setOi();
+      }
+      fetch("https://v2-api.niftychain.in/api/get-tickers")
+        .then((data) => data.json())
+        .then((data) => {
+          let tickerEl = document.getElementById("ticker");
+          data.data.forEach((e) => {
+            if (e.Name == "NIFTY")
+              tickerEl.innerHTML += `<option selected="selected" value="${e.Name}">${e.Name}</option>`;
+            else
+              tickerEl.innerHTML += `<option value="${e.Name}">${e.Name}</option>`;
+          });
+        });
+      const ctx = document.getElementById("myChart");
+      let lastPCR = 0;
+      let lastchngPCR = 0;
+
+      const data = {
+        labels: [2, "4311", "4571", "4588"],
+        datasets: [
+          {
+            data: [5996, 4605, 1288, 3463, 5996, 4605, 1288, 3463],
+            backgroundColor: [
+              "rgba(245, 48, 32, 0.55)",
+              "rgba(37, 255, 32, 0.55)",
+              "rgba(245, 48, 32, 0.55)",
+              "rgba(37, 255, 32, 0.55)",
+              "rgba(245, 48, 32, 0.55)",
+              "rgba(37, 255, 32, 0.55)",
+              "rgba(245, 48, 32, 0.55)",
+              "rgba(37, 255, 32, 0.55)",
+            ],
+            borderColor: [
+              "rgba(245, 48, 32, 0.8)",
+              "rgba(37, 255, 32, 0.55)",
+              "rgba(245, 48, 32, 0.8)",
+              "rgba(37, 255, 32, 0.55)",
+              "rgba(245, 48, 32, 0.8)",
+              "rgba(37, 255, 32, 0.55)",
+              "rgba(245, 48, 32, 0.8)",
+              "rgba(37, 255, 32, 0.55)",
+            ],
+          },
+        ],
+      };
+
+      Chart.defaults.color = "white";
+      let myChart = new Chart(ctx, {
+        type: "bar",
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+          tooltips: {
+            callbacks: {
+              label: (tooltipItem, data) => {
+                let i = tooltipItem.index;
+                return data.productNames[i] + ": " + data.datasets[0].data[i];
+              },
+            },
+          },
+        },
+        data: data,
+      });
+
+      function setOi() {
+        fetch("https://v2-api.niftychain.in/api/live-data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          },
+          body: "ticker=" + ticker,
+        }).then(async (data) => {
+          let hehe = await data.json();
+          let stkDiff =
+            hehe.data.data[1].strikePrice - hehe.data.data[0].strikePrice;
+          let stkprice =
+            Math.round(hehe.data.underlyingValue / stkDiff) * stkDiff;
+          for (let x = 0; x < hehe.data.data.length; x++) {
+            if (hehe.data.data[x].strikePrice == stkprice) {
+              addData(
+                myChart,
+                [
+                  hehe.data.data[x - 1].ce[Mode],
+                  hehe.data.data[x - 1].pe[Mode],
+                  hehe.data.data[x].ce[Mode],
+                  hehe.data.data[x].pe[Mode],
+                  hehe.data.data[x + 1].ce[Mode],
+                  hehe.data.data[x + 1].pe[Mode],
+                ],
+                [
+                  hehe.data.data[x - 1].strikePrice,
+                  hehe.data.data[x - 1].strikePrice,
+                  hehe.data.data[x].strikePrice,
+                  hehe.data.data[x].strikePrice,
+                  hehe.data.data[x + 1].strikePrice,
+                  hehe.data.data[x + 1].strikePrice,
+                ],
+                0
+              );
+            }
+          }
+        });
+      }
+      function setPCR() {
+        fetch(
+          "https://webapi.niftytrader.in/webapi/option/fatch-option-chain?symbol=" +
+            ticker
+        ).then(async (data) => {
+          let json = await data.json();
+          console.log(json);
+          let hehe = json.resultData.opDatas;
+          let pSum = 0;
+          let cSum = 0;
+          let pSumChng = 0;
+          let cSumChng = 0;
+          for (x in hehe) {
+            pSum += hehe[x].puts_oi;
+            cSum += hehe[x].calls_oi;
+            pSumChng += hehe[x].puts_change_oi;
+            cSumChng += hehe[x].calls_change_oi;
+          }
+          let PCR = Math.round((pSum / cSum) * 1000) / 1000;
+          if (PCR > lastPCR && lastPCR != 0)
+            document.getElementById("success").play();
+          else if (PCR < lastPCR) document.getElementById("error").play();
+          document.getElementById("PCR").innerHTML = "PCR: " + PCR;
+          //hehe
+          let chngPCR = Math.round((pSumChng / cSumChng) * 1000) / 1000;
+          document.getElementById("chngPCR").innerHTML =
+            "changeOi PCR: " + chngPCR;
+          if (PCR != lastPCR)
+            document.getElementById("PCR").style =
+              lastPCR == 0
+                ? "color:white;"
+                : PCR > lastPCR
+                ? "color:green;background-color: white;line-height: 2;"
+                : "color:red;background-color: white;line-height: 2;";
+          lastPCR = PCR;
+          if (chngPCR != lastchngPCR)
+            document.getElementById("chngPCR").style =
+              lastchngPCR == 0
+                ? "color:white;"
+                : chngPCR > lastchngPCR
+                ? "color:green;background-color: white;line-height: 2;"
+                : "color:red;background-color: white;line-height: 2;";
+          lastchngPCR = chngPCR;
+        });
+      }
+      setOi();
+      setPCR();
+      setInterval(() => {
+        setOi();
+        setPCR();
+      }, 10000);
+
+      function addData(chart, data, labels, datasetIndex) {
+        chart.data.datasets[datasetIndex].data = data;
+        chart.data.labels = labels;
+        chart.update();
+      }
+    </script>
+  </body>
+</html>

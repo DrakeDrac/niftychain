@@ -29,7 +29,7 @@
         src="https://niftychain.in/"
         frameborder="0"
       ></iframe>
-      <div style="flex: 0.8; height: 95%" class="chart">
+      <div style="flex: 0.8; height: 90%" class="chart">
         <div style="flex-direction: row">
           <span style="color: white"> Ticker: </span>
           <select onchange="setTicker(this.value)" id="ticker"></select>
@@ -188,12 +188,13 @@
           }
           let PCR = Math.round((pSum / cSum) * 1000) / 1000;
           if (PCR > lastPCR && lastPCR != 0)
-          document.getElementById("success").play();
+            document.getElementById("success").play();
           else if (PCR < lastPCR) document.getElementById("error").play();
           document.getElementById("PCR").innerHTML = "PCR: " + PCR;
           //hehe
-          let chngPCR= Math.round((pSumChng / cSumChng) * 1000) / 1000;
-          document.getElementById("chngPCR").innerHTML =  "changeOi PCR: "+chngPCR;
+          let chngPCR = Math.round((pSumChng / cSumChng) * 1000) / 1000;
+          document.getElementById("chngPCR").innerHTML =
+            "changeOi PCR: " + chngPCR;
           if (PCR != lastPCR)
             document.getElementById("PCR").style =
               lastPCR == 0
@@ -204,12 +205,12 @@
           lastPCR = PCR;
           if (chngPCR != lastchngPCR)
             document.getElementById("chngPCR").style =
-            lastchngPCR == 0
+              lastchngPCR == 0
                 ? "color:white;"
                 : chngPCR > lastchngPCR
                 ? "color:green;background-color: white;line-height: 2;"
                 : "color:red;background-color: white;line-height: 2;";
-                lastchngPCR = chngPCR;
+          lastchngPCR = chngPCR;
         });
       }
       setOi();

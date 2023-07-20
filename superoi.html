@@ -94,6 +94,20 @@
         ticker = e;
         setOi();
         lastPCR = 0;
+        oiData = [];
+        coiData = [];
+        xValues = [];
+        var date = new Date();
+
+        var minutes = date.getMinutes();
+        var hour = date.getHours();
+        for (let i = 0; i < 10; i++) {
+          oiData.push(pcr);
+          coiData.push(cpcr);
+          xValues.push(hour + ":" + minutes);
+        }
+        addData(oiline, oiData, xValues, 0);
+        addData(coiline, coiData, xValues, 0);
       }
       let Mode = "openInterest";
       function setMode(e) {

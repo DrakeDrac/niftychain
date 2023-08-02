@@ -54,6 +54,7 @@
       function setTicker(e) {
         ticker = e;
         setOi();
+        setPCR();
         lastPCR = 0;
       }
       let Mode = "openInterest";
@@ -141,15 +142,7 @@
             hehe.data.data[1].strikePrice - hehe.data.data[0].strikePrice;
           let stkprice =
             Math.round(hehe.data.underlyingValue / stkDiff) * stkDiff;
-          let pSum = 0;
-          let cSum = 0;
-          let pSumChng = 0;
-          let cSumChng = 0;
           for (let x = 0; x < hehe.data.data.length; x++) {
-            pSum += hehe.data.data[x].pe["openInterest"];
-            cSum += hehe.data.data[x].ce["openInterest"];
-            pSumChng += hehe.data.data[x].pe["changeinOpenInterest"];
-            cSumChng += hehe.data.data[x].ce["changeinOpenInterest"];
             if (hehe.data.data[x].strikePrice == stkprice) {
               addData(
                 myChart,
@@ -173,31 +166,6 @@
               );
             }
           }
-          let PCR = Math.round((pSum / cSum) * 1000) / 1000;
-          if (PCR > lastPCR && lastPCR != 0)
-            document.getElementById("success").play();
-          else if (PCR < lastPCR) document.getElementById("error").play();
-          document.getElementById("PCR").innerHTML = "PCR: " + PCR;
-          //hehe
-          let chngPCR = Math.round((pSumChng / cSumChng) * 1000) / 1000;
-          document.getElementById("chngPCR").innerHTML =
-            "changeOi PCR: " + chngPCR;
-          if (PCR != lastPCR)
-            document.getElementById("PCR").style =
-              lastPCR == 0
-                ? "color:white;"
-                : PCR > lastPCR
-                ? "color:green;background-color: white;line-height: 2;"
-                : "color:red;background-color: white;line-height: 2;";
-          lastPCR = PCR;
-          if (chngPCR != lastchngPCR)
-            document.getElementById("chngPCR").style =
-              lastchngPCR == 0
-                ? "color:white;"
-                : chngPCR > lastchngPCR
-                ? "color:green;background-color: white;line-height: 2;"
-                : "color:red;background-color: white;line-height: 2;";
-          lastchngPCR = chngPCR;
         });
       }
       function setPCR() {
@@ -246,8 +214,10 @@
         });
       }
       setOi();
+      setPCR();
       setInterval(() => {
         setOi();
+        setPCR();
       }, 10000);
 
       function addData(chart, data, labels, datasetIndex) {

@@ -22,7 +22,6 @@
         <source src="./error.mp3" type="audio/mpeg" />
       </audio>
       <div style="flex: 0.8; height: 50%" class="chart">
-        <span id="chngPCR" style="color: white"> PCR: 0 </span>
         <canvas id="coiline"></canvas>
         <canvas id="coiChart"></canvas>
       </div>
@@ -34,13 +33,11 @@
             display: flex;
           "
         >
-          <span id="PCR" style="color: white"> PCR: 0 </span>
           <div>
             <span style="color: white"> Ticker: </span>
             <select onchange="setTicker(this.value)" id="ticker"></select>
           </div>
         </div>
-        <canvas id="oiline"></canvas>
         <canvas id="oiChart"></canvas>
       </div>
     </div>
@@ -58,8 +55,14 @@
           labels: xValues,
           datasets: [
             {
-              label: "Change in OI PCR",
+              label: "Volume",
               data: [860, 1140, 1060, 1060, 1070, 1110, 1330, 2210, 7830, 2478],
+              borderColor: coiColor,
+              fill: false,
+            },
+            {
+              label: "Volume",
+              data: [200, 1140, 1920, 1060, 1070, 1110, 1330, 2210, 7830, 2478],
               borderColor: coiColor,
               fill: false,
             },
@@ -70,25 +73,6 @@
         },
       });
       let oiColor = "white";
-      let oiline = new Chart("oiline", {
-        type: "line",
-        data: {
-          labels: xValues,
-          datasets: [
-            {
-              label: "PCR",
-              data: [
-                1600, 1700, 1700, 1900, 2000, 2700, 4000, 5000, 6000, 7000,
-              ],
-              borderColor: oiColor,
-              fill: false,
-            },
-          ],
-        },
-        options: {
-          legend: { display: false },
-        },
-      });
       let ticker = "NIFTY";
       function setTicker(e) {
         ticker = e;
@@ -106,7 +90,7 @@
           coiData.push(cpcr);
           xValues.push(hour + ":" + minutes);
         }
-        addData(oiline, oiData, xValues, 0);
+        //addData(oiline, oiData, xValues, 0);
         addData(coiline, coiData, xValues, 0);
       }
       let Mode = "openInterest";
@@ -223,38 +207,18 @@
           for (let x = 0; x < hehe.data.data.length; x++) {
             cSum += hehe.data.data[x].ce.openInterest;
             pSum += hehe.data.data[x].pe.openInterest;
-            ccSum += hehe.data.data[x].ce.changeinOpenInterest;
-            pcSum += hehe.data.data[x].pe.changeinOpenInterest;
+            ccSum += hehe.data.data[x].ce.totalTradedVolume;
+            pcSum += hehe.data.data[x].pe.totalTradedVolume;
             if (hehe.data.data[x].strikePrice == stkprice) {
-              addData(
-                oiChart,
-                [
-                  hehe.data.data[x - 1].ce.openInterest,
-                  hehe.data.data[x - 1].pe.openInterest,
-                  hehe.data.data[x].ce.openInterest,
-                  hehe.data.data[x].pe.openInterest,
-                  hehe.data.data[x + 1].ce.openInterest,
-                  hehe.data.data[x + 1].pe.openInterest,
-                ],
-                [
-                  hehe.data.data[x - 1].strikePrice,
-                  hehe.data.data[x - 1].strikePrice,
-                  hehe.data.data[x].strikePrice,
-                  hehe.data.data[x].strikePrice,
-                  hehe.data.data[x + 1].strikePrice,
-                  hehe.data.data[x + 1].strikePrice,
-                ],
-                0
-              );
               addData(
                 coiChart,
                 [
-                  hehe.data.data[x - 1].ce.changeinOpenInterest,
-                  hehe.data.data[x - 1].pe.changeinOpenInterest,
-                  hehe.data.data[x].ce.changeinOpenInterest,
-                  hehe.data.data[x].pe.changeinOpenInterest,
-                  hehe.data.data[x + 1].ce.changeinOpenInterest,
-                  hehe.data.data[x + 1].pe.changeinOpenInterest,
+                  hehe.data.data[x - 1].ce.totalTradedVolume,
+                  hehe.data.data[x - 1].pe.totalTradedVolume,
+                  hehe.data.data[x].ce.totalTradedVolume,
+                  hehe.data.data[x].pe.totalTradedVolume,
+                  hehe.data.data[x + 1].ce.totalTradedVolume,
+                  hehe.data.data[x + 1].pe.totalTradedVolume,
                 ],
                 [
                   hehe.data.data[x - 1].strikePrice,
@@ -268,8 +232,11 @@
               );
             }
           }
-          let pcr = Math.round((pSum / cSum) * 1000) / 1000;
-          let cpcr = Math.round((pcSum / ccSum) * 1000) / 1000;
+
+          addData(oiChart, [ccSum, pcSum], ["Call Vol", "Puts Vol"], 0);
+
+          let pcr = pcSum;
+          let cpcr = ccSum;
           if (oiData.length == 0) {
             var date = new Date();
 
@@ -302,11 +269,10 @@
             }
           }
 
-          addData(oiline, oiData, xValues, 0);
+          //addData(oiline, oiData, xValues, 0);
           addData(coiline, coiData, xValues, 0);
-          document.getElementById("PCR").innerHTML = "PCR: " + pcr;
-          document.getElementById("chngPCR").innerHTML =
-            "Change in OI PCR: " + cpcr;
+          addData(coiline, oiData, xValues, 1);
+          //document.getElementById("PCR").innerHTML = "PCR: " + pcr;
         });
       }
       setOi();

@@ -197,7 +197,8 @@
         },
         data: data,
       });
-
+      let lastccsum = 0;
+      let lastpcsum = 0;
       function setOi() {
         fetch("https://v2-api.niftychain.in/api/live-data", {
           method: "POST",
@@ -242,6 +243,16 @@
                 0
               );
             }
+          }
+          if (ccSum > lastccsum) {
+            document.getElementById("callvol").style = "color:green;";
+          } else if (ccSum < lastccsum) {
+            document.getElementById("callvol").style = "color:red;";
+          }
+          if (pcSum > lastpcsum) {
+            document.getElementById("putvol").style = "color:green;";
+          } else if (pcSum < lastpcsum) {
+            document.getElementById("putvol").style = "color:red;";
           }
 
           addData(oiChart, [ccSum, pcSum], ["Call Vol", "Puts Vol"], 0);

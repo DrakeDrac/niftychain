@@ -12,6 +12,7 @@
         bottom: 0;
       }
     </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
   </head>
   <body style="background-color: #424242">
     <div style="display: flex; flex-direction: row; height: 100%">
@@ -28,7 +29,7 @@
       <div style="flex: 0.8; height: 50%" class="chart">
         <div
           style="
-            flex-direction: row;
+            flex-direction: column;
             justify-content: space-around;
             display: flex;
           "
@@ -36,6 +37,16 @@
           <div>
             <span style="color: white"> Ticker: </span>
             <select onchange="setTicker(this.value)" id="ticker"></select>
+          </div>
+          <div
+            style="
+              display: flex;
+              flex-direction: row;
+              justify-content: space-around;
+            "
+          >
+            <span id="callvol" style="color: white"> Ticker: </span>
+            <span id="putvol" style="color: white"> Ticker: </span>
           </div>
         </div>
         <canvas id="oiChart"></canvas>
@@ -272,7 +283,10 @@
           //addData(oiline, oiData, xValues, 0);
           addData(coiline, coiData, xValues, 0);
           addData(coiline, oiData, xValues, 1);
-          //document.getElementById("PCR").innerHTML = "PCR: " + pcr;
+          document.getElementById("callvol").innerHTML =
+            "Calls Volume: " + numeral(ccSum).format("0.00a");
+          document.getElementById("putvol").innerHTML =
+            "Puts Volume: " + numeral(pcSum).format("0.00a");
         });
       }
       setOi();

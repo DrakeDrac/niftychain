@@ -43,13 +43,18 @@
         </div>
         <span id="PCR" style="color: white"> PCR: 0 </span>
         <span id="chngPCR" style="color: white"> PCR: 0 </span>
-        <canvas id="myChart"></canvas>
+        <div id="hehe">
+          <canvas style="height: 50%" id="vol"></canvas>
+          <canvas id="myChart"></canvas>
+        </div>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+      document.getElementById("hehe").style =
+        "height:" + window.innerHeight / 2.2 + ";";
       let ticker = "NIFTY";
       function setTicker(e) {
         ticker = e;
@@ -73,6 +78,7 @@
           });
         });
       const ctx = document.getElementById("myChart");
+      const vol = document.getElementById("vol");
       let lastPCR = 0;
       let lastchngPCR = 0;
 
@@ -127,6 +133,19 @@
         },
         data: data,
       });
+      let volChart = new Chart(vol, {
+        type: "bar",
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+        data: data,
+      });
 
       function setOi() {
         fetch("https://v2-api.niftychain.in/api/live-data", {
@@ -145,6 +164,12 @@
           let cSum = 0;
           let pSumChng = 0;
           let cSumChng = 0;
+          addData(
+            volChart,
+            [hehe.data.totalVolumeCe, hehe.data.totalVolumePe],
+            ["CE", "PE"],
+            0
+          );
           for (let x = 0; x < hehe.data.data.length; x++) {
             pSum += hehe.data.data[x].pe["openInterest"];
             cSum += hehe.data.data[x].ce["openInterest"];
@@ -177,7 +202,15 @@
           if (PCR > lastPCR && lastPCR != 0)
             document.getElementById("success").play();
           else if (PCR < lastPCR) document.getElementById("error").play();
-          document.getElementById("PCR").innerHTML = "PCR: " + PCR;
+          document.getElementById("PCR").innerHTML =
+            "PCR: " +
+            PCR +
+            '<span style="float:right;">CPR Vol: ' +
+            Math.round(
+              (hehe.data.totalVolumeCe / hehe.data.totalVolumePe) * 1000
+            ) /
+              1000 +
+            "</span>";
           //hehe
           let chngPCR = Math.round((pSumChng / cSumChng) * 1000) / 1000;
           document.getElementById("chngPCR").innerHTML =

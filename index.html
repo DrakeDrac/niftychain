@@ -66,7 +66,7 @@
         Mode = e;
         setOi();
       }
-      fetch("https://v2-api.niftychain.in/api/get-tickers")
+      fetch("https://api.niftychain.in/api/get-tickers")
         .then((data) => data.json())
         .then((data) => {
           let tickerEl = document.getElementById("ticker");
@@ -148,7 +148,7 @@
       });
 
       function setOi() {
-        fetch("https://v2-api.niftychain.in/api/live-data", {
+        fetch("https://api.niftychain.in/api/live-data", {
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",

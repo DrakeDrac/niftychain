@@ -148,12 +148,11 @@
       });
 
       function setOi() {
-        fetch("https://api.niftychain.in/api/live-data", {
-          method: "POST",
+        fetch("https://api.niftychain.in/api/live-data?symbol="+ticker, {
+          method: "GET",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
           },
-          body: "ticker=" + ticker,
         }).then(async (data) => {
           let hehe = await data.json();
           let stkDiff =

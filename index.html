@@ -24,6 +24,12 @@
       <audio id="error">
         <source src="./error.mp3" type="audio/mpeg" />
       </audio>
+      <audio id="volD">
+        <source src="./volD.mp3" type="audio/mpeg" />
+      </audio>
+      <audio id="volU">
+        <source src="./volU.mp3" type="audio/mpeg" />
+      </audio>
       <iframe
         style="flex: 2"
         src="https://niftychain.in/"
@@ -147,6 +153,8 @@
         data: data,
       });
 
+      let lastVolCpr;
+      let volColor = "white";
       function setOi() {
         fetch("https://api.niftychain.in/api/live-data?symbol=" + ticker, {
           method: "GET",
@@ -200,18 +208,43 @@
             }
           }
           let PCR = Math.round((pSum / cSum) * 1000) / 1000;
+          if (
+            Math.round(
+              (hehe.data.totalVolumeCe / hehe.data.totalVolumePe) * 1000
+            ) /
+              1000 >
+            lastVolCpr
+          ) {
+            volColor = "green";
+            document.getElementById("volU").play();
+          } else if (
+            Math.round(
+              (hehe.data.totalVolumeCe / hehe.data.totalVolumePe) * 1000
+            ) /
+              1000 !=
+            lastVolCpr
+          ) {
+            document.getElementById("volD").play();
+            volColor = "red";
+          }
           if (PCR > lastPCR && lastPCR != 0)
             document.getElementById("success").play();
           else if (PCR < lastPCR) document.getElementById("error").play();
           document.getElementById("PCR").innerHTML =
             "PCR: " +
             PCR +
-            '<span style="float:right;">CPR Vol: ' +
+            '<span style="float:right; color:' +
+            volColor +
+            ';">CPR Vol: ' +
             Math.round(
               (hehe.data.totalVolumeCe / hehe.data.totalVolumePe) * 1000
             ) /
               1000 +
             "</span>";
+          lastVolCpr =
+            Math.round(
+              (hehe.data.totalVolumeCe / hehe.data.totalVolumePe) * 1000
+            ) / 1000;
           //hehe
           let chngPCR = Math.round((pSumChng / cSumChng) * 1000) / 1000;
           document.getElementById("chngPCR").innerHTML =

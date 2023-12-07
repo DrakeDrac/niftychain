@@ -148,10 +148,12 @@
       });
 
       function setOi() {
-        fetch("https://api.niftychain.in/api/live-data?symbol="+ticker, {
+        fetch("https://api.niftychain.in/api/live-data?symbol=" + ticker, {
           method: "GET",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            authorization:
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpZGh1eWFzaDIwMDZAZ21haWwuY29tIiwic3ViIjoiNjUxZTg1ZmYzYTNkODYxNzFiYTBlNzY2IiwiZGV2aWNlIjoid2ViIiwiaWF0IjoxNzAxOTQyMjAyLCJleHAiOjE3MDQ1MzQyMDJ9.43hKaG3mhFTEaRBggC7srwGzZJwikDixwUNJEMkU6DY",
           },
         }).then(async (data) => {
           let hehe = await data.json();

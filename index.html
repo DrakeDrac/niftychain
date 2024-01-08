@@ -156,12 +156,12 @@
       let lastVolCpr;
       let volColor = "white";
       function setOi() {
-        fetch("https://api.niftychain.in/api/live-data?symbol=" + ticker, {
+        fetch("https://pro.niftychain.in/api/live-data?symbol=" + ticker, {
           method: "GET",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
             authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InNpZGh1eWFzaDIwMDZAZ21haWwuY29tIiwic3ViIjoiNjUxZTg1ZmYzYTNkODYxNzFiYTBlNzY2IiwiZGV2aWNlIjoid2ViIiwiaWF0IjoxNzAxOTQyMjAyLCJleHAiOjE3MDQ1MzQyMDJ9.43hKaG3mhFTEaRBggC7srwGzZJwikDixwUNJEMkU6DY",
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtYW5zaWRodTgxQGdtYWlsLmNvbSIsInN1YiI6IjY0ZWMxNzcxNjYzMzFhMjdiMmJiYWUzNiIsImlzUHJvIjp0cnVlLCJwbGFuRXhwaXJ5IjoxNzA3MjgxMTA2MzA2LCJkZXZpY2UiOiJ3ZWIiLCJpYXQiOjE3MDQ2OTg2MjcsImV4cCI6MTcwNTMwMzQyN30.SUkUsb5F2gwtZC-SnUwXpa94l-UoOTkKbryxAjIRLHs",
           },
         }).then(async (data) => {
           let hehe = await data.json();

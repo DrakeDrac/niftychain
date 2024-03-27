@@ -71,8 +71,8 @@
       function setMode(e) {
         Mode = e;
         setOi();
-      }
-      fetch("https://api.niftychain.in/api/get-tickers")
+      } //https://api.aoccalculator.in/api/live-data?symbol=NIFTY
+      fetch("https://api.aoccalculator.in/api/get-tickers")
         .then((data) => data.json())
         .then((data) => {
           let tickerEl = document.getElementById("ticker");
@@ -156,12 +156,12 @@
       let lastVolCpr;
       let volColor = "white";
       function setOi() {
-        fetch("https://ninja.niftychain.in/api/live-data?symbol=" + ticker, {
+        fetch("https://api.aoccalculator.in/api/live-data?symbol=" + ticker, {
           method: "GET",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
             authorization:
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtYW5zaWRodTgxQGdtYWlsLmNvbSIsInN1YiI6IjY0ZWMxNzcxNjYzMzFhMjdiMmJiYWUzNiIsImlzUHJvIjp0cnVlLCJwbGFuRXhwaXJ5IjoxNzEyNDY1MTA2MzA2LCJkZXZpY2UiOiJ3ZWIiLCJpYXQiOjE3MDYwNzI0OTAsImV4cCI6MTcwNjY3NzI5MH0.32CxRm0vUhDmcNAi502aZjyYT-sHa1VuTYTFDO0h2Rs",
+              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFtYW5zaWRodTgxQGdtYWlsLmNvbSIsInN1YiI6IjY0ZWMxNzcxNjYzMzFhMjdiMmJiYWUzNiIsImlzUHJvIjp0cnVlLCJwbGFuRXhwaXJ5IjoxNzE0MTU1MDY2MjQxLCJkZXZpY2UiOiJ3ZWIiLCJpYXQiOjE3MTE1NjM2NjcsImV4cCI6MTcxMjE2ODQ2N30.BlVP_s6FfpW4fn_rb4s8NpyHngVA7bx0lRdQSfCMong",
           },
         }).then(async (data) => {
           let hehe = await data.json();

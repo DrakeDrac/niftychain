@@ -59,8 +59,29 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-      let auth="";
-      fetch("./ok.txt").then(r=>r.text()).then(r=>auth=r.trim());
+      let auth = "";
+      fetch("./ok.txt")
+        .then((r) => r.text())
+        .then((r) => (auth = r.trim()))
+        .then(() => {
+          fetch("https://api.aoccalculator.in/api/get-tickers", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+              authorization: auth,
+            },
+          })
+            .then((data) => data.json())
+            .then((data) => {
+              let tickerEl = document.getElementById("ticker");
+              data.data.forEach((e) => {
+                if (e.Name == "NIFTY")
+                  tickerEl.innerHTML += `<option selected="selected" value="${e.Name}">${e.Name}</option>`;
+                else
+                  tickerEl.innerHTML += `<option value="${e.Name}">${e.Name}</option>`;
+              });
+            });
+        });
       document.getElementById("hehe").style =
         "height:" + window.innerHeight / 2.2 + ";";
       let ticker = "NIFTY";
@@ -74,17 +95,7 @@
         Mode = e;
         setOi();
       } //https://api.aoccalculator.in/api/live-data?symbol=NIFTY
-      fetch("https://api.aoccalculator.in/api/get-tickers")
-        .then((data) => data.json())
-        .then((data) => {
-          let tickerEl = document.getElementById("ticker");
-          data.data.forEach((e) => {
-            if (e.Name == "NIFTY")
-              tickerEl.innerHTML += `<option selected="selected" value="${e.Name}">${e.Name}</option>`;
-            else
-              tickerEl.innerHTML += `<option value="${e.Name}">${e.Name}</option>`;
-          });
-        });
+
       const ctx = document.getElementById("myChart");
       const vol = document.getElementById("vol");
       let lastPCR = 0;
@@ -162,8 +173,7 @@
           method: "GET",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-            authorization:
-              auth,
+            authorization: auth,
           },
         }).then(async (data) => {
           let hehe = await data.json();

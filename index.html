@@ -64,7 +64,7 @@
         .then((r) => r.text())
         .then((r) => (auth = r.trim()))
         .then(() => {
-          fetch("https://api.aoccalculator.in/api/get-tickers", {
+          fetch("https://v61.niftychain.in/api/get-tickers", {
             method: "GET",
             headers: {
               "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
@@ -169,7 +169,7 @@
       let lastVolCpr;
       let volColor = "white";
       function setOi() {
-        fetch("https://api.aoccalculator.in/api/live-data?symbol=" + ticker, {
+        fetch("https://v61.niftychain.in/api/live-data?symbol=" + ticker, {
           method: "GET",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
